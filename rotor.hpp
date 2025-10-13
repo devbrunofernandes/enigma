@@ -1,6 +1,7 @@
 #ifndef ROTOR_HPP
 #define ROTOR_HPP
 
+#include <algorithm>
 #include <cctype>
 #include <string>
 
