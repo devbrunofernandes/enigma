@@ -1,4 +1,5 @@
 
+#include <algorithm>
 #include <cctype>
 #include <string>
 
@@ -12,26 +13,29 @@ private:
 
 public:
     Rotor(string wiring, char notch, int startingPosition) {
+        transform(wiring.begin(), wiring.end(), wiring.begin(), ::tolower);
+        notch = tolower(notch);
+
         entryWiring = wiring;
         this->notch = notch;
-        position = startingPosition;
+        position = startingPosition - 1;
     }
 
     bool rotate() {
-        bool turnover = entryWiring[position] == notch;
+        bool turnover = (position + 'a') == notch;
 
-        position = (position + 1) % 25;
+        position = (position + 1) % 26;
 
         return turnover;
     }
 
     char passLetter(char letter) {
         if(!isalpha(letter)) return letter;
+        letter = tolower(letter);
+        string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-        return entryWiring[(letter - 'a' + position) % 25];
+        char internalChange = entryWiring[(letter - 'a' + position) % 26];
+        internalChange = internalChange - 'a' - position < 0 ? alphabet[internalChange - 'a' - position + 26] : alphabet[internalChange - 'a' - position];
+        return internalChange;
     }
 };
-
-int main() {
-    return 0;
-}
