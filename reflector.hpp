@@ -8,9 +8,11 @@ class Reflector {
 private:
     std::string wiring;
 
+    void validateWiring(const std::string wiring);
+
 public:
     Reflector(std::string wiring);
-    char reflect(char input);
+    char reflect(char input) const;
 };
 
 #endif
