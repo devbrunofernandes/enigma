@@ -43,8 +43,8 @@ void Plugboard::undoConnection() {
     connections--;
 }
 
-char Plugboard::getLetter(char x) {
-    if(!isalpha(x)) return x;
-
-    return letters[x - 'a'];
+void Plugboard::swap(char &x) {
+    if(isalpha(x)) {
+        x = letters[x - 'a'];
+    }
 }

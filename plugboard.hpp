@@ -20,7 +20,7 @@ public:
     void connect(char x, char y);
     void clear();
     void undoConnection();
-    char getLetter(char x);
+    void swap(char &x);
 };
 
 #endif
