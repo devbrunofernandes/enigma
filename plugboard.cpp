@@ -2,18 +2,10 @@
 #include <stdexcept>
 
 Plugboard::Plugboard() {
-    for(char i='a'; i<='z'; i++) {
-        letters[i - 'a'] = i;
-    }
-    connections = 0;
+    reset();
 }
 
-Plugboard::Plugboard(string pairs) {
-    for(char i='a'; i<='z'; i++) {
-        letters[i - 'a'] = i;
-    }
-    connections = 0;
-
+Plugboard::Plugboard(string pairs) : Plugboard() {
     transform(pairs.begin(), pairs.end(), pairs.begin(), ::tolower);
 
     stringstream ss(pairs);
@@ -39,7 +31,7 @@ void Plugboard::connect(char x, char y) {
     connections++;
 }
 
-void Plugboard::clear() {
+void Plugboard::reset() {
     for(char i='a'; i<='z'; i++) {
         letters[i - 'a'] = i;
     }
@@ -58,13 +50,13 @@ void Plugboard::undoConnection() {
     connections--;
 }
 
-void Plugboard::swap(char &x) {
+void Plugboard::swap(char &x) const {
     if(isalpha(x)) {
-        x = letters[x - 'a'];
+        x = letters[tolower(x) - 'a'];
     }
 }
 
-void Plugboard::validateConnection(char x, char y) {
+void Plugboard::validateConnection(char x, char y) const {
     string currentPair = string(1, x) + string(1, y);
     if(!isalpha(x) || !isalpha(y)) {
         throw invalid_argument("Invalid plugboard configuration: '" + currentPair + "' has non-alphabetic characters.");

@@ -2,8 +2,6 @@
 #include "plugboard.hpp"
 #include "reflector.hpp"
 
-#include <iostream>
-
 using namespace std;
 
 // default values for reflectors
@@ -38,21 +36,13 @@ char Enigma::rotorsTraverse(char letter, int current_rotor) {
     // letter = rotorsTraverse(letter, current_rotor-1);
     // letter = rotors[current_rotor].passLetter(letter);
 
-    cout << "=======================================" << endl;
     for(int i = current_rotor; i >= 0; i--) {
         letter = rotors[i].passLetter(letter);
-        cout << "current letter: " << letter << endl;
     }
-        
-
     letter = r.reflect(letter);
-    cout << "reflects into: " << letter << endl;
-
     for(int i = 0; i < rotors.size(); i++) {
         letter = rotors[i].passLetterReverse(letter);
-        cout << "current letter: " << letter << endl;
     }
-    cout << "=======================================" << endl;
 
     return letter;
 }

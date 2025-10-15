@@ -4,3 +4,4 @@
 .gitignore
 enigma_machine
 *.exe
+build/
