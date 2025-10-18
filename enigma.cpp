@@ -1,7 +1,7 @@
 #include "enigma.hpp"
-#include "plugboard.hpp"
-#include "reflector.hpp"
+#include <cctype>
 #include <stdexcept>
+#include <iostream>
 
 using namespace std;
 
@@ -29,24 +29,52 @@ Enigma::Enigma() : r(REFLECTOR_B), pb() {
     rotors.push_back(Rotor(ROTOR_III, 0));
 }
 
-char Enigma::rotorsTraverse(char letter) {
+Enigma::Enigma(EnigmaConfig config) : r(chooseReflector(config.reflector)), pb(config.plugboardConnections) {
+    generateRotors(config);
+}
+
+char Enigma::rotorsTraverse(char letter, bool showSteps) {
+    char lastLetter = letter;
+
     for(int i = rotors.size() - 1; i >= 0; i--) {
         letter = rotors[i].passLetter(letter);
+        if(showSteps) {
+            cout << i << "nd Rotor: " << lastLetter << " -> " << letter << endl;
+            lastLetter = letter;
+        }
     }
+
     letter = r.reflect(letter);
+    if(showSteps) {
+        cout << "Reflector: " << lastLetter << " -> " << letter << endl;
+        lastLetter = letter;
+    }
+
     for(int i = 0; i < rotors.size(); i++) {
         letter = rotors[i].passLetterReverse(letter);
+        if(showSteps) {
+            cout << i << "nd Rotor: " << lastLetter << " -> " << letter << endl;
+            lastLetter = letter;
+        }
     }
 
     return letter;
 }
 
-char Enigma::encode(char input) {
-    char output = input;
+char Enigma::encode(char input, bool showSteps) {
+    char output = input, lastLetter = output;
 
     pb.swap(output);
-    output = rotorsTraverse(output);
+    if(showSteps) {
+        cout << "Plugboard: " << lastLetter << " -> " << output << endl;
+        lastLetter = output;
+    }
+    output = rotorsTraverse(output, showSteps);
     pb.swap(output);
+    if(showSteps) {
+        cout << "Plugboard: " << lastLetter << " -> " << output << endl;
+        lastLetter = output;
+    }
 
     return output;
 }
@@ -59,14 +87,14 @@ void Enigma::rotorsRotate() {
     }
 }
 
-char Enigma::press(char pressed_key) {
+char Enigma::press(char pressed_key, bool showSteps) {
     pressed_key = tolower(pressed_key);
 
     rotorsRotate();
 
     if(!isalpha(pressed_key)) return pressed_key;
 
-    return encode(pressed_key);
+    return encode(pressed_key, showSteps);
 }
 
 vector<char> Enigma::getRotorsPositions() const {
@@ -104,3 +132,32 @@ void Enigma::generateRotors(const EnigmaConfig config) {
 
     rotors = tmpRotors;
 }
+
+string Enigma::chooseReflector(const string reflectorName) {
+    string reflectorConnections;
+    transform(reflectorName.begin(), reflectorName.end(), reflectorName.begin(), ::toupper);
+
+    if(reflectorName == "A") {
+        reflectorConnections = REFLECTOR_A;
+    } else if(reflectorName == "B") {
+        reflectorConnections = REFLECTOR_B;
+    } else if(reflectorName == "C") {
+        reflectorConnections = REFLECTOR_C;
+    } else {
+        throw invalid_argument("Invalid reflector configuration: '" + reflectorName + "' is not a type of reflector.");
+    }
+
+    return reflectorConnections;
+}
+
+string Enigma::encodeText(string text) {
+    string output = "";
+
+    for(char c: text) {
+        if(!isalpha(c)) {
+            output += press(c, false);
+        }
+    }
+
+    return output;
+}   

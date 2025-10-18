@@ -18,14 +18,17 @@ private:
     Plugboard pb;
 
     void rotorsRotate();
-    char encode(char input);
-    char rotorsTraverse(char letter);
+    char encode(char input, bool showSteps);
+    char rotorsTraverse(char letter, bool showSteps);
     void generateRotors(const EnigmaConfig config);
+    string chooseReflector(const string reflectorName);
 
 public:
     Enigma();
-    char press(char pressed_key);
+    Enigma(EnigmaConfig config);
+    char press(char pressed_key, bool showSteps);
     vector<char> getRotorsPositions() const;
+    string encodeText(string text);
 };
 
 #endif
