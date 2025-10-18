@@ -1,20 +1,21 @@
 #include "enigma.hpp"
 #include "plugboard.hpp"
 #include "reflector.hpp"
+#include <stdexcept>
 
 using namespace std;
 
 // default values for reflectors
-#define REFLECTOR_A Reflector("EJMZALYXVBWFCRQUONTSPIKHGD")
-#define REFLECTOR_B Reflector("YRUHQSLDPXNGOKMIEBFZCWVJAT")
-#define REFLECTOR_C Reflector("FVPJIAOYEDRZXWGCTKUQSBNMHL")
+#define REFLECTOR_A "EJMZALYXVBWFCRQUONTSPIKHGD"
+#define REFLECTOR_B "YRUHQSLDPXNGOKMIEBFZCWVJAT"
+#define REFLECTOR_C "FVPJIAOYEDRZXWGCTKUQSBNMHL"
 
 // default values for rotors
-#define ROTOR_I Rotor("EKMFLGDQVZNTOWYHXUSPAIBRCJ", 'Q', 1)
-#define ROTOR_II Rotor("AJDKSIRUXBLHWTMCQGZNPYFVOE", 'E', 1)
-#define ROTOR_III Rotor("BDFHJLCPRTXVZNYEIWGAKMUSQO", 'V', 1)
-#define ROTOR_IV Rotor("ESOVPZJAYQUIRHXLNFTGKDCMWB", 'J', 1)
-#define ROTOR_V Rotor("VZBRGITYUPSDNHLXAWMJQOFECK", 'Z', 1)
+#define ROTOR_I "EKMFLGDQVZNTOWYHXUSPAIBRCJ", 'Q'
+#define ROTOR_II "AJDKSIRUXBLHWTMCQGZNPYFVOE", 'E'
+#define ROTOR_III "BDFHJLCPRTXVZNYEIWGAKMUSQO", 'V'
+#define ROTOR_IV "ESOVPZJAYQUIRHXLNFTGKDCMWB", 'J'
+#define ROTOR_V "VZBRGITYUPSDNHLXAWMJQOFECK", 'Z'
 
 /*  Default Enigma constructor:
     Rotors: I II III
@@ -22,21 +23,14 @@ using namespace std;
     Reflector: B
     No plugboard change
 */
-Enigma::Enigma() : r("YRUHQSLDPXNGOKMIEBFZCWVJAT"), pb() {
-    rotors.push_back(ROTOR_I);
-    rotors.push_back(ROTOR_II);
-    rotors.push_back(ROTOR_III);
+Enigma::Enigma() : r(REFLECTOR_B), pb() {
+    rotors.push_back(Rotor(ROTOR_I, 0));
+    rotors.push_back(Rotor(ROTOR_II, 0));
+    rotors.push_back(Rotor(ROTOR_III, 0));
 }
 
-char Enigma::rotorsTraverse(char letter, int current_rotor) {
-    // if(current_rotor < 0)
-    //     return r.reflect(letter);
-
-    // letter = rotors[current_rotor].passLetter(letter);
-    // letter = rotorsTraverse(letter, current_rotor-1);
-    // letter = rotors[current_rotor].passLetter(letter);
-
-    for(int i = current_rotor; i >= 0; i--) {
+char Enigma::rotorsTraverse(char letter) {
+    for(int i = rotors.size() - 1; i >= 0; i--) {
         letter = rotors[i].passLetter(letter);
     }
     letter = r.reflect(letter);
@@ -51,7 +45,7 @@ char Enigma::encode(char input) {
     char output = input;
 
     pb.swap(output);
-    output = rotorsTraverse(output, rotors.size()-1);
+    output = rotorsTraverse(output);
     pb.swap(output);
 
     return output;
@@ -75,10 +69,38 @@ char Enigma::press(char pressed_key) {
     return encode(pressed_key);
 }
 
-vector<char> Enigma::rotorsPositions() {
+vector<char> Enigma::getRotorsPositions() const {
     vector<char> positions;
     for(Rotor ro: rotors) {
         positions.push_back(ro.getPosition() + 'a');
     }
     return positions;
+}
+
+void Enigma::generateRotors(const EnigmaConfig config) {
+    vector<Rotor> tmpRotors;
+    int positionIndex = 0;
+
+    if(config.rotorInitial.size() != config.rotorNames.size()) {
+        throw invalid_argument("Invalid configuration: rotors names and initial positions doesn't match.");
+    }
+
+    for(string s: config.rotorNames) {
+        if(s == "I") {
+            tmpRotors.push_back(Rotor(ROTOR_I, config.rotorInitial[positionIndex] - 'a'));
+        } else if(s == "II") {
+            tmpRotors.push_back(Rotor(ROTOR_II, config.rotorInitial[positionIndex] - 'a'));
+        } else if(s == "III") {
+            tmpRotors.push_back(Rotor(ROTOR_III, config.rotorInitial[positionIndex] - 'a'));
+        } else if(s == "IV") {
+            tmpRotors.push_back(Rotor(ROTOR_IV, config.rotorInitial[positionIndex] - 'a'));
+        } else if(s == "V") {
+            tmpRotors.push_back(Rotor(ROTOR_V, config.rotorInitial[positionIndex] - 'a'));
+        } else {
+            throw invalid_argument("Invalid rotor configuration: '" + s + "' is not a type of rotor.");
+        }
+        positionIndex++;
+    }
+
+    rotors = tmpRotors;
 }

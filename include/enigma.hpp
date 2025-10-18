@@ -4,6 +4,7 @@
 #include "plugboard.hpp"
 #include "rotor.hpp"
 #include "reflector.hpp"
+#include "enigmaConfig.hpp"
 #include <vector>
 
 using namespace std;
@@ -16,13 +17,15 @@ private:
     Reflector r;
     Plugboard pb;
 
+    void rotorsRotate();
+    char encode(char input);
+    char rotorsTraverse(char letter);
+    void generateRotors(const EnigmaConfig config);
+
 public:
     Enigma();
     char press(char pressed_key);
-    char encode(char input);
-    char rotorsTraverse(char letter, int current_rotor); 
-    void rotorsRotate();
-    vector<char> rotorsPositions();
+    vector<char> getRotorsPositions() const;
 };
 
 #endif

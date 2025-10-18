@@ -15,7 +15,7 @@ Rotor::Rotor(string wiring, char notch, int startingPosition) {
     reverse(wiring.begin(), wiring.end());
     reverseWiring = wiring;
     this->notch = notch;
-    position = startingPosition - 1;
+    position = startingPosition;
 }
 
 bool Rotor::rotate() {

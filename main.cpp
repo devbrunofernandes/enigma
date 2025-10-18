@@ -5,14 +5,20 @@
 using namespace std;
 
 void printPositions(Enigma en) {
-    vector<char> positions = en.rotorsPositions();
+    vector<char> positions = en.getRotorsPositions();
     for(char c: positions) {
         cout << c << " ";
     }
     cout << endl;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    // if(argc == 1) {
+    //     iterativeMode();
+    // } else {
+    //     argumentMode();
+    // }
+
     Enigma e;
     char c;
 
