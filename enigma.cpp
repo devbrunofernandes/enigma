@@ -70,6 +70,8 @@ char Enigma::encode(char input, bool showSteps) {
         lastLetter = output;
     }
     output = rotorsTraverse(output, showSteps);
+    lastLetter = output;
+
     pb.swap(output);
     if(showSteps) {
         cout << "Plugboard: " << lastLetter << " -> " << output << endl;

@@ -9,6 +9,13 @@
 #include <string>
 #include <set>
 
+#ifdef _WIN32
+    #include <windows.h>
+#else
+    #include <sys/ioctl.h>
+    #include <unistd.h>
+#endif
+
 using namespace std;
 
 void showConfiguration(EnigmaConfig &config) {
@@ -22,7 +29,7 @@ void showConfiguration(EnigmaConfig &config) {
     }
     cout << endl;
 
-    pause();
+    waitForEnter();
 }
 
 void reflectorConfiguration(EnigmaConfig &config) {
@@ -57,7 +64,7 @@ void reflectorConfiguration(EnigmaConfig &config) {
 
         cout << "Reflector configured sucessfully" << endl;
         config.reflector = reflectorChoice;
-        pause();
+        waitForEnter();
         break;
     }
 }
@@ -108,7 +115,7 @@ void plugboardConfiguration(EnigmaConfig &config) {
 
         cout << "Plugboard configured sucessfully" << endl;
         config.plugboardConnections = line;
-        pause();
+        waitForEnter();
         break;
     }
 }
@@ -148,7 +155,7 @@ void rotorPositionConfiguration(EnigmaConfig &config) {
 
         cout << "Rotors positions configured sucessfully" << endl;
         config.rotorInitial = positions;
-        pause();
+        waitForEnter();
         break;
     }
 }
@@ -157,7 +164,7 @@ void rotorConfiguration(EnigmaConfig &config) {
     set<string> validRotors = {"I", "II", "III", "IV", "V"};
 
     while(true) {
-        cout << "Expected input -> I II III" << endl;
+        cout << "Expected input -> I II III (minimum 3 rotors)" << endl;
         cout << "Possible rotors -> [I, II, III, IV, V]" << endl;
         cout << "Select rotors: ";
 
@@ -199,22 +206,29 @@ void rotorConfiguration(EnigmaConfig &config) {
 
         cout << "Rotors configured sucessfully" << endl;
         config.rotorNames = chosenRotors;
-        pause();
+        waitForEnter();
         break;
     }
 }
 
-void configurationMenu() {
-    cout << "====================================================================================================================" << endl;
-    cout << "                                            Configuration Menu" << endl;
-    cout << "====================================================================================================================" << endl;
+void configurationMenu(int terminalWidth) {
+    string bar(terminalWidth, '=');
+    string title = "Configuration Menu";
+    int padding = (terminalWidth - title.length()) / 2;
+
+    string blankSpace = "";
+    if(padding > 0) {blankSpace = string(padding, ' ');}
+
+    cout << bar << endl;
+    cout << blankSpace << title << endl;
+    cout << bar << endl;
     cout << "1 - Rotors" << endl;
     cout << "2 - Rotors initial position" << endl;
     cout << "3 - Plugboard" << endl;
     cout << "4 - Reflector" << endl;
     cout << "5 - Show actual configuration" << endl;
     cout << "6 - Return" << endl;
-    cout << "====================================================================================================================" << endl;
+    cout << bar << endl;
 }
 
 int selectConfigurationOption(Enigma &en, EnigmaConfig &config) {
@@ -227,6 +241,8 @@ int selectConfigurationOption(Enigma &en, EnigmaConfig &config) {
         option = stoi(input);
     } catch (const exception& e) {
     }
+
+    if(input == "return") {option = 6;}
 
     switch (option) {
         case 1:
@@ -254,25 +270,42 @@ int selectConfigurationOption(Enigma &en, EnigmaConfig &config) {
             break;
         default:
             cout << "Wrong option: '" << input << "' is not a valid option." << endl;
-            pause();
+            waitForEnter();
     }
 
     return option;
 }
 
-void handleConfiguration(Enigma &en, EnigmaConfig &config) {
+void handleConfiguration(Enigma &en, EnigmaConfig &config, int terminalWidth) {
     while(true) {
-        configurationMenu();
+        configurationMenu(terminalWidth);
         int option = selectConfigurationOption(en, config);
 
         if(option == 6) {break;}
     }
 }
 
-void pause() {
+void waitForEnter() {
     string input;
     cout << "Press anything to continue...";
     getline(cin, input);
+}
+
+int getTerminalWidth() {
+#ifdef _WIN32
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    HANDLE stdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    if(!GetConsoleScreenBufferInfo(stdHandle, &csbi)) {
+        return 80;
+    }
+
+    return csbi.srWindow.Right - csbi.srWindow.Left + 1;
+#else
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    return w.ws_col;
+#endif
 }
 
 void printPositions(Enigma en) {
@@ -283,42 +316,57 @@ void printPositions(Enigma en) {
     cout << endl;
 }
 
-void displayLogo() {
+void displayLogo(int terminalWidth) {
+    string bar(terminalWidth, '=');
+    int logoLength = 117;
+    int padding = (terminalWidth - logoLength) / 2;
+
+    string blankSpace = "";
+    if(padding > 0) {blankSpace = string(padding, ' ');}
+
     cout << endl;                                                                                                                
-    cout << "                                          :*@@@@@@@@@@@@@@@@@@@@@@@@@@@#:                                           " << endl;
-    cout << "                                    %@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@:                                    " << endl;
-    cout << "                              #@@@@@@@@@@@@=   -@@@@             -@@@    -#@@@@@@@@@%:                              " << endl;
-    cout << "                         .@@@@@@@@@@@@@@@@@    -@@@      %@@*      @@            @@@@@@@@#                          " << endl;
-    cout << "                     :@@@@@@@@*        =@@@    -@@@    :@@@@@@     @@    -.          @@@@@@@@+                      " << endl;
-    cout << "                  #@@@@@@@#             =@@    :@@%    -@@@@@@@@@@@@@    %@@    -     =@@@@@@@@@@.                  " << endl;
-    cout << "               #@@@@@@  =@#    @@@@@    .@@    :@@%    -@@@@@@@@@@@@@    %@@    @@    =@@@@@   %@@@@-               " << endl;
-    cout << "            *@@@@@=     -@%    @@@@@     @@    :@@@    -@@@@@@@@@@@@@    @@@    @@    *@@@=        @@@@*            " << endl;
-    cout << "          @@@@@+     .@@@@@    @@@@@     @@    .@@@    -@@@@@@@@@@@@@    @@@   :@@    #@@#   *@%     @@@@@          " << endl;
-    cout << "        :@@@@     =@@@@@@@@    @@@@@     @@    .@@@    -@@@@@@@@@@@@@    @@@   -@@    %@@    @@@@   .@@@@@@.        " << endl;
-    cout << "          @@@    @@@@@@@@@@    @@@@@     @@    .@@@    =@@@@@@@@@@@@@    @@@   =@@    @@.   @@@@#   :@@@@           " << endl;
-    cout << "           @@    +*++*@@@@@    @@@@@     @@    .@@@    =@@+=======%@@    @@@   +@@    @@    @@@@+   -@@@%           " << endl;
-    cout << "          .@@         @@@@@    @@@@@.    @@    .@@@    =@-         @@    @@@   #@@    @@    @+      =@@@%           " << endl;
-    cout << "          @@@.   @@@@@@@@@@    @@@@@.    @@     @@@    +@@@@@@@    @@    @@@   %@@    @@            *@@@@=          " << endl;
-    cout << "       .@@@@@-   *@@@@@@@@@    @@@@@:    @@.    @@@    +@@@@@@@    @@    @@@   @@@    @@    #@@@    #@@@@@@         " << endl;
-    cout << "         @@@@@      +@@@@@@    @@@@@:    @@.    @@@    +@@@@@@@    @@    @@%   @@@    @%   @@@@@    %@@@@           " << endl;
-    cout << "           .@@@@@=       @@    @@@@@:    @@.    @@@    +@@@@@@@   .@@    @@%   @@@    @#   %@@@@ -@@@%              " << endl;
-    cout << "               @@@@@@+   @@    %@@@@-    @@:    @@@    *@@@@@@@   .@@    @@#   @@@    @#   #@@@@@@*                 " << endl;
-    cout << "                  -@@@@@@@@-   #@@@@-    @@-    @@@    *@@@@@@@   :@@    @@#   @@%    @@#@@@@@%.                    " << endl;
-    cout << "                       @@@@@@@@@@@@@=    @@=    @@@    *@@@@@@%   :@%    @@*   @@# %@@@@@@%                         " << endl;
-    cout << "                           :%@@@@@@@@%+: @@=    @@@               %@%    @@@+@@@@@@@@@-                             " << endl;
-    cout << "                                  +@@@@@@@@@@%:.@@@@#            @@@@@@@@@@@@@@@-                                   " << endl;
-    cout << "                                         -#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%=                                          " << endl;
+    cout << blankSpace << "                                          :*@@@@@@@@@@@@@@@@@@@@@@@@@@@#:                                           " << endl;
+    cout << blankSpace << "                                    %@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@:                                    " << endl;
+    cout << blankSpace << "                              #@@@@@@@@@@@@=   -@@@@             -@@@    -#@@@@@@@@@%:                              " << endl;
+    cout << blankSpace << "                         .@@@@@@@@@@@@@@@@@    -@@@      %@@*      @@            @@@@@@@@#                          " << endl;
+    cout << blankSpace << "                     :@@@@@@@@*        =@@@    -@@@    :@@@@@@     @@    -.          @@@@@@@@+                      " << endl;
+    cout << blankSpace << "                  #@@@@@@@#             =@@    :@@%    -@@@@@@@@@@@@@    %@@    -     =@@@@@@@@@@.                  " << endl;
+    cout << blankSpace << "               #@@@@@@  =@#    @@@@@    .@@    :@@%    -@@@@@@@@@@@@@    %@@    @@    =@@@@@   %@@@@-               " << endl;
+    cout << blankSpace << "            *@@@@@=     -@%    @@@@@     @@    :@@@    -@@@@@@@@@@@@@    @@@    @@    *@@@=        @@@@*            " << endl;
+    cout << blankSpace << "          @@@@@+     .@@@@@    @@@@@     @@    .@@@    -@@@@@@@@@@@@@    @@@   :@@    #@@#   *@%     @@@@@          " << endl;
+    cout << blankSpace << "        :@@@@     =@@@@@@@@    @@@@@     @@    .@@@    -@@@@@@@@@@@@@    @@@   -@@    %@@    @@@@   .@@@@@@.        " << endl;
+    cout << blankSpace << "          @@@    @@@@@@@@@@    @@@@@     @@    .@@@    =@@@@@@@@@@@@@    @@@   =@@    @@.   @@@@#   :@@@@           " << endl;
+    cout << blankSpace << "           @@    +*++*@@@@@    @@@@@     @@    .@@@    =@@+=======%@@    @@@   +@@    @@    @@@@+   -@@@%           " << endl;
+    cout << blankSpace << "          .@@         @@@@@    @@@@@.    @@    .@@@    =@-         @@    @@@   #@@    @@    @+      =@@@%           " << endl;
+    cout << blankSpace << "          @@@.   @@@@@@@@@@    @@@@@.    @@     @@@    +@@@@@@@    @@    @@@   %@@    @@            *@@@@=          " << endl;
+    cout << blankSpace << "       .@@@@@-   *@@@@@@@@@    @@@@@:    @@.    @@@    +@@@@@@@    @@    @@@   @@@    @@    #@@@    #@@@@@@         " << endl;
+    cout << blankSpace << "         @@@@@      +@@@@@@    @@@@@:    @@.    @@@    +@@@@@@@    @@    @@%   @@@    @%   @@@@@    %@@@@           " << endl;
+    cout << blankSpace << "           .@@@@@=       @@    @@@@@:    @@.    @@@    +@@@@@@@   .@@    @@%   @@@    @#   %@@@@ -@@@%              " << endl;
+    cout << blankSpace << "               @@@@@@+   @@    %@@@@-    @@:    @@@    *@@@@@@@   .@@    @@#   @@@    @#   #@@@@@@*                 " << endl;
+    cout << blankSpace << "                  -@@@@@@@@-   #@@@@-    @@-    @@@    *@@@@@@@   :@@    @@#   @@%    @@#@@@@@%.                    " << endl;
+    cout << blankSpace << "                       @@@@@@@@@@@@@=    @@=    @@@    *@@@@@@%   :@%    @@*   @@# %@@@@@@%                         " << endl;
+    cout << blankSpace << "                           :%@@@@@@@@%+: @@=    @@@               %@%    @@@+@@@@@@@@@-                             " << endl;
+    cout << blankSpace << "                                  +@@@@@@@@@@%:.@@@@#            @@@@@@@@@@@@@@@-                                   " << endl;
+    cout << blankSpace << "                                         -#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%=                                          " << endl;
 }
 
-void displayMenu() {
-    cout << "====================================================================================================================" << endl;
-    cout << "                                                  Main Menu" << endl;
-    cout << "====================================================================================================================" << endl;
+void displayMenu(int terminalWidth) {
+    string bar(terminalWidth, '=');
+    string title = "Main Menu";
+    int padding = (terminalWidth - title.length()) / 2;
+
+    string blankSpace = "";
+    if(padding > 0) {blankSpace = string(padding, ' ');}
+
+    cout << bar << endl;
+    cout << blankSpace << title << endl;
+    cout << bar << endl;
     cout << "1 - Enigma configuration (will reset your enigma machine)" << endl;
     cout << "2 - Encrypt text" << endl;
     cout << "3 - Encrypt characters showing steps" << endl;
-    cout << "4 - Exit" << endl;
-    cout << "====================================================================================================================" << endl;
+    cout << "4 - Reset enigma state" << endl;
+    cout << "5 - Exit" << endl;
+    cout << bar << endl;
 }
 
 void textEncryption(Enigma &en) {
@@ -327,7 +375,7 @@ void textEncryption(Enigma &en) {
     getline(cin, input);
     output = en.encodeText(input);
     cout << output << endl;
-    pause();
+    waitForEnter();
 }
 
 void encryptionSteps(Enigma &en) {
@@ -372,13 +420,13 @@ void encryptionSteps(Enigma &en) {
     }
 }
 
-int selectOption(Enigma &en, EnigmaConfig &config) {
+int selectOption(Enigma &en, EnigmaConfig &config, int terminalWidth) {
     int option = -1;
     string input;
     cout << "Select option: ";
     getline(cin, input);
 
-    if(input == "exit") {return 4;}
+    if(input == "exit") {return 5;}
 
     try {
         option = stoi(input);
@@ -387,7 +435,7 @@ int selectOption(Enigma &en, EnigmaConfig &config) {
 
     switch (option) {
         case 1:
-            handleConfiguration(en, config);
+            handleConfiguration(en, config, terminalWidth);
             break;
         case 2:
             textEncryption(en);
@@ -396,25 +444,36 @@ int selectOption(Enigma &en, EnigmaConfig &config) {
             encryptionSteps(en);
             break;
         case 4:
+            try {
+                en = Enigma(config);
+                cout << "Enigma machine rotors position back from configurated state (default: A A A)" << endl;
+            } catch (const std::exception& e) {
+                std::cerr << "Error saving configuration - " << e.what() << std::endl;
+                option = -1;
+            }
+            waitForEnter();
+            break;
+        case 5:
             cout << "exiting..." << endl;
             break;
         default:
             cout << "Wrong option: '" << input << "' is not a valid option." << endl;
-            pause();
+            waitForEnter();
     }
 
     return option;
 }
 
-void interactiveMode() {
+void interactiveMode() { 
     EnigmaConfig config;
     Enigma en(config);
 
     while(true) {
-        displayLogo();
-        displayMenu();
-        int option = selectOption(en, config);
+        int currentWidth = getTerminalWidth();
+        if(currentWidth >= 130) {displayLogo(currentWidth);}
+        displayMenu(currentWidth);
+        int option = selectOption(en, config, currentWidth);
 
-        if(option == 4) {break;}
+        if(option == 5) {break;}
     }
 }
