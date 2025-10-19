@@ -21,7 +21,7 @@ private:
     char encode(char input, bool showSteps);
     char rotorsTraverse(char letter, bool showSteps);
     void generateRotors(const EnigmaConfig config);
-    string chooseReflector(const string reflectorName);
+    string chooseReflector(string reflectorName);
 
 public:
     Enigma();

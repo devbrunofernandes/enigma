@@ -1,5 +1,4 @@
 /output/
-*.txt
 .vscode/
 .gitignore
 enigma_machine

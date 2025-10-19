@@ -39,7 +39,7 @@ char Enigma::rotorsTraverse(char letter, bool showSteps) {
     for(int i = rotors.size() - 1; i >= 0; i--) {
         letter = rotors[i].passLetter(letter);
         if(showSteps) {
-            cout << i << "nd Rotor: " << lastLetter << " -> " << letter << endl;
+            cout << i+1 << "nd Rotor: " << lastLetter << " -> " << letter << endl;
             lastLetter = letter;
         }
     }
@@ -53,7 +53,7 @@ char Enigma::rotorsTraverse(char letter, bool showSteps) {
     for(int i = 0; i < rotors.size(); i++) {
         letter = rotors[i].passLetterReverse(letter);
         if(showSteps) {
-            cout << i << "nd Rotor: " << lastLetter << " -> " << letter << endl;
+            cout << i+1 << "nd Rotor: " << lastLetter << " -> " << letter << endl;
             lastLetter = letter;
         }
     }
@@ -115,15 +115,15 @@ void Enigma::generateRotors(const EnigmaConfig config) {
 
     for(string s: config.rotorNames) {
         if(s == "I") {
-            tmpRotors.push_back(Rotor(ROTOR_I, config.rotorInitial[positionIndex] - 'a'));
+            tmpRotors.push_back(Rotor(ROTOR_I, toupper(config.rotorInitial[positionIndex]) - 'A'));
         } else if(s == "II") {
-            tmpRotors.push_back(Rotor(ROTOR_II, config.rotorInitial[positionIndex] - 'a'));
+            tmpRotors.push_back(Rotor(ROTOR_II, toupper(config.rotorInitial[positionIndex]) - 'A'));
         } else if(s == "III") {
-            tmpRotors.push_back(Rotor(ROTOR_III, config.rotorInitial[positionIndex] - 'a'));
+            tmpRotors.push_back(Rotor(ROTOR_III, toupper(config.rotorInitial[positionIndex]) - 'A'));
         } else if(s == "IV") {
-            tmpRotors.push_back(Rotor(ROTOR_IV, config.rotorInitial[positionIndex] - 'a'));
+            tmpRotors.push_back(Rotor(ROTOR_IV, toupper(config.rotorInitial[positionIndex]) - 'A'));
         } else if(s == "V") {
-            tmpRotors.push_back(Rotor(ROTOR_V, config.rotorInitial[positionIndex] - 'a'));
+            tmpRotors.push_back(Rotor(ROTOR_V, toupper(config.rotorInitial[positionIndex]) - 'A'));
         } else {
             throw invalid_argument("Invalid rotor configuration: '" + s + "' is not a type of rotor.");
         }
@@ -133,7 +133,7 @@ void Enigma::generateRotors(const EnigmaConfig config) {
     rotors = tmpRotors;
 }
 
-string Enigma::chooseReflector(const string reflectorName) {
+string Enigma::chooseReflector(string reflectorName) {
     string reflectorConnections;
     transform(reflectorName.begin(), reflectorName.end(), reflectorName.begin(), ::toupper);
 
@@ -154,8 +154,10 @@ string Enigma::encodeText(string text) {
     string output = "";
 
     for(char c: text) {
-        if(!isalpha(c)) {
+        if(isalpha(c)) {
             output += press(c, false);
+        } else {
+            output += c;
         }
     }
 
