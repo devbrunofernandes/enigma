@@ -9,12 +9,16 @@ Rotor::Rotor(string wiring, char notch, int startingPosition) {
     if(wiring.size() != 26) throw exception();
 
     transform(wiring.begin(), wiring.end(), wiring.begin(), ::tolower);
-    notch = tolower(notch);
 
+    string reverseWiring(26, '-');
+    char actualAlphabetLetter = 'a';
+    for(char c: wiring) {
+        reverseWiring[c - 'a'] = actualAlphabetLetter;
+        actualAlphabetLetter++;
+    }
     entryWiring = wiring;
-    reverse(wiring.begin(), wiring.end());
-    reverseWiring = wiring;
-    this->notch = notch;
+    this->reverseWiring = reverseWiring;
+    this->notch = tolower(notch);
     position = startingPosition;
 }
 
@@ -48,9 +52,7 @@ char Rotor::passLetterReverse(char letter) {
 
     int index = (alphabet[(letter - 'a')] - 'a' + position) % 26;
 
-    int outputPosition;
-    for(outputPosition=0; outputPosition<26; outputPosition++)
-        if(entryWiring[outputPosition] == alphabet[index]) break;
+    int outputPosition = reverseWiring[index] - 'a';
 
     outputPosition = outputPosition - position < 0 ? outputPosition - position + 26 : outputPosition - position;
 
