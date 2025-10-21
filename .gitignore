@@ -4,4 +4,6 @@
 enigma_machine
 *.exe
 build/
+build-windows/
 .cache/
+toolchain-windows.cmake
