@@ -2,9 +2,9 @@
 #define ARGUMENT_UI_HPP
 
 #include "enigma.hpp"
+#include <iostream>
 
-void handleConfiguration();
-void printPositions(Enigma en);
+void processStream(Enigma &en, std::istream &inStream, std::ostream &outStream);
 void argumentMode();
 
 #endif
