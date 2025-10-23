@@ -1,4 +1,3 @@
-#include "enigma.hpp"
 #include "interactiveUI.hpp"
 #include "argumentUI.hpp"
 
@@ -9,25 +8,20 @@
 #endif
 
 int main(int argc, char* argv[]) {
-    if(argc > 1) {
-        // argumentMode(argc, argv);
+    bool stdinIsTty, stdoutIsTty;
+
+    #ifdef _WIN32
+        stdinIsTty = _isatty(_fileno(stdin));
+        stdoutIsTty = _isatty(_fileno(stdout));
+    #else
+        stdinIsTty = isatty(STDIN_FILENO);
+        stdoutIsTty = isatty(STDOUT_FILENO);
+    #endif
+
+    if(argc == 1 && stdinIsTty && stdoutIsTty) {
+        interactiveMode();
     } else {
-         bool isInteractiveTerminal;
-
-        #ifdef _WIN32
-            isInteractiveTerminal = _isatty(_fileno(stdin));
-        #else
-            isInteractiveTerminal = isatty(STDIN_FILENO);
-        #endif
-
-        if(isInteractiveTerminal) {
-            interactiveMode();
-        } else {
-            EnigmaConfig config;
-            Enigma en(config);
-
-            processStream(en, std::cin, std::cout);
-        }
+        argumentMode(argc, argv, stdinIsTty);
     }
 
     return 0;

@@ -53,7 +53,7 @@ void reflectorConfiguration(EnigmaConfig &config) {
         }
 
         if(!validReflectors.count(reflectorChoice)) {
-            cout << "Error: '" << reflectorChoice << "is not a valid reflector" << endl;
+            cout << "Error: '" << reflectorChoice << "' is not a valid reflector" << endl;
             continue;
         }
 
@@ -181,13 +181,13 @@ void rotorConfiguration(EnigmaConfig &config) {
         
         while(ss >> word) {
             if(!validRotors.count(word)) {
-                cout << "Error: '" << word << "is not a valid rotor" << endl;
+                cout << "Error: '" << word << "' is not a valid rotor" << endl;
                 lineIsValid = false;
                 break;
             }
 
             if(uniqueRotorsCheck.count(word)) {
-                cout << "Error: Rotor '" << word << "was already chosen" << endl;
+                cout << "Error: Rotor '" << word << "' was already chosen" << endl;
                 lineIsValid = false;
                 break;
             }
@@ -381,12 +381,20 @@ void textEncryption(Enigma &en) {
 
 void encryptionSteps(Enigma &en) {
     while(true) {
-        cout << "====================================================================================================================" << endl;
+        int terminalWidth = getTerminalWidth();
+        string bar(terminalWidth, '=');
+        cout << bar << endl;
+        cout << "Rotors positions: ";
         printPositions(en);
+        cout << "<- write 'return' to go back" << endl;
         cout << "Type a letter to encrypt: ";
 
         string letter;
         getline(cin, letter);
+
+        transform(letter.begin(), letter.end(), letter.begin(), ::tolower);
+        if(letter == "return")
+            break;
 
         stringstream ss(letter);
         string readLetter;
@@ -447,7 +455,7 @@ int selectOption(Enigma &en, EnigmaConfig &config, int terminalWidth) {
         case 4:
             try {
                 en = Enigma(config);
-                cout << "Enigma machine rotors position back from configurated state (default: A A A)" << endl;
+                cout << "Enigma machine rotors position back from configurated state (positions: " + config.rotorInitial +")" << endl;
             } catch (const std::exception& e) {
                 std::cerr << "Error saving configuration - " << e.what() << std::endl;
                 option = -1;

@@ -3,8 +3,11 @@
 
 #include "enigma.hpp"
 #include <iostream>
+#include <vector>
+#include <string>
 
 void processStream(Enigma &en, std::istream &inStream, std::ostream &outStream);
-void argumentMode();
+void argumentMode(int argc, char* argv[], bool stdinIsTty);
+std::vector<std::string> parseRotors(std::string rotors);
 
 #endif

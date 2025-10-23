@@ -2,6 +2,7 @@
 #include <cctype>
 #include <stdexcept>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -92,9 +93,9 @@ void Enigma::rotorsRotate() {
 char Enigma::press(char pressed_key, bool showSteps) {
     pressed_key = tolower(pressed_key);
 
-    rotorsRotate();
-
     if(!isalpha(pressed_key)) return pressed_key;
+
+    rotorsRotate();
 
     return encode(pressed_key, showSteps);
 }
@@ -111,8 +112,27 @@ void Enigma::generateRotors(const EnigmaConfig config) {
     vector<Rotor> tmpRotors;
     int positionIndex = 0;
 
+    if(config.rotorInitial.size() < 3) {
+        throw invalid_argument("Invalid configuration: only '" + 
+            to_string(config.rotorNames.size()) + 
+            "' rotor(s) provided, but minimum is three.");
+    }
+
     if(config.rotorInitial.size() != config.rotorNames.size()) {
-        throw invalid_argument("Invalid configuration: rotors names and initial positions doesn't match.");
+        throw invalid_argument("Invalid configuration: " + 
+            to_string(config.rotorNames.size()) + 
+            " rotor(s) provided, but " +
+            to_string(config.rotorInitial.size()) +
+            " initial position(s) provided.");
+    }
+
+    for (char c : config.rotorInitial) {
+        if (!isalpha(c)) { 
+            throw invalid_argument(
+                "Invalid configuration: Initial position '" + string(1, c) + 
+                "' is not an alphabetic character."
+            );
+        }
     }
 
     for(string s: config.rotorNames) {
