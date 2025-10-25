@@ -1,4 +1,4 @@
-![Enigma logo](images/Enigma-logo.png)
+![Enigma logo](https://github.com/user-attachments/assets/55def9ce-b370-4527-82e5-7938a6e8ab15)
 
 # Simulador da Máquina Enigma em C++
 
@@ -62,7 +62,7 @@ Inicia um menu interativo que guia o usuário na configuração da máquina Enig
 
 **Caso de Uso:** Ideal para aprender como a máquina funciona, testar configurações ou usar o visualizador passo-a-passo.
 
-![interactive mode output](images/interactive-mode.png)
+![interactive mode output](https://github.com/user-attachments/assets/05e18674-f040-4fc2-a3c2-857a08f31d74)
 
 ### Modo de Argumentos (Pipeline)
 
@@ -76,8 +76,8 @@ Funciona como um filtro de linha de comando, processando toda a entrada do `stdi
 
 **Caso de Uso:** Feito para scripting e integração com outras ferramentas de linha de comando em um pipeline Unix. Também serve para processar arquivos de texto.
 
-![usage of help flag](images/help.png)
+![usage of help flag](https://github.com/user-attachments/assets/f26a9ed9-9de7-49a8-a6c4-a893025184be)
 
 ## 🖥️ Exemplos de Uso
 
-![example use for program](images/testing.png)
+![example use for program](https://github.com/user-attachments/assets/404c6f67-4e5e-4fe7-80c0-08740ef47afb)
