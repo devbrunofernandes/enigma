@@ -1,4 +1,4 @@
-![Enigma logo](images/Enigma-logo.png)
+![Enigma logo](https://github.com/user-attachments/assets/55def9ce-b370-4527-82e5-7938a6e8ab15)
 
 # Enigma Machine C++ Simulator
 
@@ -62,7 +62,7 @@ Starts an interactive menu that guides the user through setting up the Enigma ma
 
 **Use Case:** Ideal for learning how the machine works, testing configurations, or using the step-by-step visualizer.
 
-![interactive mode output](images/interactive-mode.png)
+![interactive mode output](https://github.com/user-attachments/assets/05e18674-f040-4fc2-a3c2-857a08f31d74)
 
 ### Argument (Pipeline) Mode
 
@@ -78,8 +78,8 @@ Runs as a command-line filter, processing all input from `stdin` or a file and p
 
 **Use Case:** Designed for scripting and integrating with other command-line tools in a Unix-like pipeline. Also for processing text files.
 
-![usage of help flag](images/help.png)
+![usage of help flag](https://github.com/user-attachments/assets/f26a9ed9-9de7-49a8-a6c4-a893025184be)
 
 ## 🖥️ Command-Line Examples
 
-![example use for program](images/testing.png)
+![example use for program](https://github.com/user-attachments/assets/404c6f67-4e5e-4fe7-80c0-08740ef47afb)
